@@ -26,9 +26,10 @@ UTKDict = {
     }
 }
 
-intersectionalDict = {}
-genderDict = {}
-raceDict = {}
+intersectionalDict = {"CFD": {}, "UTKFace": {}}
+genderDict = {"CFD": {}, "UTKFace": {}}
+raceDict = {"CFD": {}, "UTKFace": {}}
+
 
 outputFileName = "./ai-soc/data/data.json"
 
@@ -56,26 +57,39 @@ def parseData(obj):
     handleDictEntry(genderDict, obj, obj['gender'])
     handleDictEntry(intersectionalDict, obj, intersection)
 
-    x.append(int(re.sub("[^0-9]", "", obj["imageId"])))
-    y.append(float(obj["score"]))
-
 def handleDictEntry(dict, obj, attribute):
-    if attribute not in dict:
-        dict[attribute] = [obj["score"]]
+    if attribute not in dict[obj['database']]:
+        dict[obj['database']][attribute] = [obj["score"]]
+        pass
     else:
-        dict[attribute].append(obj["score"])
+        dict[obj['database']][attribute].append(obj["score"])
+        pass
 
 def createGraph(dicty):
-    data = []
-    keys = []
-    for key in dicty:
-        keys.append(key)
-        data.append(dicty[key])
+    CFDData = []
+    CFDKeys = []
+    UTKData = []
+    UTKKeys = []
+
+    for databases in dicty:
+        for key in dicty[databases]:
+            print(key)
+            if (databases == "CFD"):
+                CFDKeys.append(key)
+                CFDData.append(dicty[databases][key])
+            elif (databases == "UTKFace"):
+                UTKKeys.append(key)
+                UTKData.append(dicty[databases][key])                
     
-    fig, ax = plt.subplots()
-    
-    plt.boxplot(data)
-    ax.set_xticklabels(keys)
+    fig = plt.figure()
+
+    ax1 = fig.add_subplot(211)
+    plt.boxplot(CFDData)
+    ax1.set_xticklabels(CFDKeys)
+
+    ax2 = fig.add_subplot(212)
+    plt.boxplot(UTKData)
+    ax2.set_xticklabels(UTKKeys)
     plt.show()
 
 for root, dirs, files in os.walk("ai-soc/test images"):
@@ -84,38 +98,40 @@ for root, dirs, files in os.walk("ai-soc/test images"):
             temp = (os.path.relpath(os.path.join(root, f), "."))
             if ((".jpg" in temp) and (count < newImgsToCheck)):
                 if ("CFD" in temp):
-                    # request = makeRequest(temp)
-                    # nsfwDict[f] = {
-                    #     'database': "CFD",
-                    #     'fullPath': temp,
-                    #     'score': request,
-                    #     'race': f[4],
-                    #     'gender': f[5],
-                    #     'modelId': f[7:10],
-                    #     'imageId': f[11:14],
-                    #     'expression': f[15:-4],
-                    # }
+                    request = makeRequest(temp)
+                    nsfwDict[f] = {
+                        'database': "CFD",
+                        'fullPath': temp,
+                        'score': request,
+                        'race': f[4],
+                        'gender': f[5],
+                        'modelId': f[7:10],
+                        'imageId': f[11:14],
+                        'expression': f[15:-4],
+                    }
+                    count += 1
                     pass
                 elif ("UTKFace" in temp):
-                    close = f[:(len(f) - 31)]
-                    age = int(close[0:-4])
-                    if ((age >= 20) and (age <= 30)):
-                        request = makeRequest(temp)
-                        tempObj = {
-                            'database': "UTKFace",
-                            'fullPath': temp,
-                            'score': request,
-                            'race': UTKDict["race"][close[-1]],
-                            'gender': UTKDict["gender"][close[-3]],
-                            'age': age,
-                        }
-                        nsfwDict[f] = tempObj
-                        count += 1
+                    # close = f[:(len(f) - 31)]
+                    # age = int(close[0:-4])
+                    # if ((age >= 20) and (age <= 30)):
+                    #     request = makeRequest(temp)
+                    #     tempObj = {
+                    #         'database': "UTKFace",
+                    #         'fullPath': temp,
+                    #         'score': request,
+                    #         'race': UTKDict["race"][close[-1]],
+                    #         'gender': UTKDict["gender"][close[-3]],
+                    #         'age': age,
+                    #     }
+                    #     nsfwDict[f] = tempObj
+                    #     count += 1
+                    pass
     
-# for key in nsfwDict:
-#     parseData(nsfwDict[key])
+for key in nsfwDict:
+    parseData(nsfwDict[key])
 
 with open(outputFileName, 'w') as fp:
     json.dump(nsfwDict, fp, indent=4)
 
-# createGraph(intersectionalDict)
+createGraph(intersectionalDict)
