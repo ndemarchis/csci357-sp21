@@ -5,7 +5,7 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 
-newImgsToCheck = 1
+newImgsToCheck = 50
 
 count = 0
 nsfwDict = {}
@@ -22,7 +22,7 @@ UTKDict = {
         "1": "B",
         "2": "A",
         "3": "A",
-        "4": "M",
+        "4": "L",
     }
 }
 
@@ -65,6 +65,13 @@ def handleDictEntry(dict, obj, attribute):
         dict[obj['database']][attribute].append(obj["score"])
         pass
 
+def zippy(keys, data):
+    zipped = zip(keys, data)
+    sortedZipped = sorted(zipped)
+    sortedKeys = sorted(keys)
+    sortedData = [element for _, element in sortedZipped]
+    return sortedKeys, sortedData
+
 def createGraph(dicty):
     CFDData = []
     CFDKeys = []
@@ -73,23 +80,27 @@ def createGraph(dicty):
 
     for databases in dicty:
         for key in dicty[databases]:
-            print(key)
             if (databases == "CFD"):
                 CFDKeys.append(key)
                 CFDData.append(dicty[databases][key])
             elif (databases == "UTKFace"):
                 UTKKeys.append(key)
                 UTKData.append(dicty[databases][key])                
-    
+
+    CFDKeys, CFDData = zippy(CFDKeys, CFDData)
+    UTKKeys, UTKData = zippy(UTKKeys, UTKData)
+
     fig = plt.figure()
 
     ax1 = fig.add_subplot(211)
-    plt.boxplot(CFDData)
+    plt.boxplot(CFDData, showfliers=False)
     ax1.set_xticklabels(CFDKeys)
+    ax1.set_title("Chicago Face Database")
 
     ax2 = fig.add_subplot(212)
-    plt.boxplot(UTKData)
+    plt.boxplot(UTKData, showfliers=False)
     ax2.set_xticklabels(UTKKeys)
+    ax2.set_title("UTKFace")
     plt.show()
 
 for root, dirs, files in os.walk("ai-soc/test images"):
@@ -97,7 +108,8 @@ for root, dirs, files in os.walk("ai-soc/test images"):
         if f not in nsfwDict:
             temp = (os.path.relpath(os.path.join(root, f), "."))
             if ((".jpg" in temp) and (count < newImgsToCheck)):
-                if ("CFD" in temp):
+                if (("CFD" in temp) and ("LF" in temp)):
+                    print(f)
                     request = makeRequest(temp)
                     nsfwDict[f] = {
                         'database': "CFD",
@@ -112,24 +124,27 @@ for root, dirs, files in os.walk("ai-soc/test images"):
                     count += 1
                     pass
                 elif ("UTKFace" in temp):
-                    # close = f[:(len(f) - 31)]
-                    # age = int(close[0:-4])
-                    # if ((age >= 20) and (age <= 30)):
-                    #     request = makeRequest(temp)
-                    #     tempObj = {
-                    #         'database': "UTKFace",
-                    #         'fullPath': temp,
-                    #         'score': request,
-                    #         'race': UTKDict["race"][close[-1]],
-                    #         'gender': UTKDict["gender"][close[-3]],
-                    #         'age': age,
-                    #     }
-                    #     nsfwDict[f] = tempObj
-                    #     count += 1
+                    print(f)
+                    close = f[:(len(f) - 31)]
+                    age = int(close[0:-4])
+                    if ((age >= 20) and (age <= 30)):
+                        request = makeRequest(temp)
+                        tempObj = {
+                            'database': "UTKFace",
+                            'fullPath': temp,
+                            'score': request,
+                            'race': UTKDict["race"][close[-1]],
+                            'gender': UTKDict["gender"][close[-3]],
+                            'age': age,
+                        }
+                        nsfwDict[f] = tempObj
+                        count += 1
                     pass
     
 for key in nsfwDict:
     parseData(nsfwDict[key])
+
+print(count)
 
 with open(outputFileName, 'w') as fp:
     json.dump(nsfwDict, fp, indent=4)
