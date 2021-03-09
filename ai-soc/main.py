@@ -5,13 +5,15 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 
-newImgsToCheck = 50
+# set this number for the new entries to check against the API
+newImgsToCheck = 0
 
 count = 0
 nsfwDict = {}
 x = []
 y = []
 
+# translate the UTK race and gender labels to the CFD equivalent
 UTKDict = {
     "gender": {
         "0": "M", 
@@ -30,15 +32,17 @@ intersectionalDict = {"CFD": {}, "UTKFace": {}}
 genderDict = {"CFD": {}, "UTKFace": {}}
 raceDict = {"CFD": {}, "UTKFace": {}}
 
-
+# specifies the output path for the data to be queried
 outputFileName = "./ai-soc/data/data.json"
 
+# loads the file if it exists
 if os.path.exists(outputFileName):
     with open(outputFileName) as f:
         nsfwDict = json.load(f)
 
 
 def makeRequest(path):
+    # makes a single request to the API with an arbitrary image path
     r = requests.post(
         "https://api.deepai.org/api/nsfw-detector",
         files={
@@ -52,12 +56,15 @@ def makeRequest(path):
 
 def parseData(obj):
 
+    # takes a dictionary object, and sends the data to be parsed by the other dictionaries
     intersection = obj['race'] + obj['gender']
     handleDictEntry(raceDict, obj, obj['race'])
     handleDictEntry(genderDict, obj, obj['gender'])
     handleDictEntry(intersectionalDict, obj, intersection)
 
 def handleDictEntry(dict, obj, attribute):
+
+    # 
     if attribute not in dict[obj['database']]:
         dict[obj['database']][attribute] = [obj["score"]]
         pass
@@ -66,6 +73,8 @@ def handleDictEntry(dict, obj, attribute):
         pass
 
 def zippy(keys, data):
+
+    # sorts the data for some group of any dictionary
     zipped = zip(keys, data)
     sortedZipped = sorted(zipped)
     sortedKeys = sorted(keys)
@@ -108,7 +117,7 @@ for root, dirs, files in os.walk("ai-soc/test images"):
         if f not in nsfwDict:
             temp = (os.path.relpath(os.path.join(root, f), "."))
             if ((".jpg" in temp) and (count < newImgsToCheck)):
-                if (("CFD" in temp) and ("LF" in temp)):
+                if (("CFD" in temp) and ("BF" in temp)):
                     print(f)
                     request = makeRequest(temp)
                     nsfwDict[f] = {
@@ -149,4 +158,4 @@ print(count)
 with open(outputFileName, 'w') as fp:
     json.dump(nsfwDict, fp, indent=4)
 
-createGraph(intersectionalDict)
+createGraph(genderDict)
