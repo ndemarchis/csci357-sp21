@@ -1,9 +1,15 @@
 # Some potentially useful modules
 # Whether or not you use these (or others) depends on your implementation!
 import random
-import numpy
+import numpy as np
 import math
 import matplotlib.pyplot as plt
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Activation, Flatten
+from keras.layers import Convolution2D, MaxPooling2D
+from keras.utils import np_utils
+
+np.random.seed(10)
 
 class NeuralMMAgent(object):
 		'''
@@ -32,6 +38,9 @@ class NeuralMMAgent(object):
 				assert num_in_nodes > 0 and num_hid_layers > 0 and num_hid_nodes and\
 						num_out_nodes > 0, "Illegal number of input, hidden, or output layers!"
 
+				self.max_sse = max_sse
+				self.max_epoch = max_epoch
+
 
 		def train_net(self, input_list, output_list, max_num_epoch=100000, \
 										max_sse=0.1):
@@ -41,10 +50,16 @@ class NeuralMMAgent(object):
 								input_list -- 2D list of inputs
 								output_list -- 2D list of outputs matching inputs
 				'''
-								#Some code...#
-						all_err.append(total_err)
 
+				all_err = [] # fix
+				total_err = 0 # fix
+								#Some code...#
+				if (True): # fix
+					if (True): # fix
+						all_err.append(total_err)
+``
 						if (total_err < max_sse):
+							for i in range (1):
 								break
 				#Show us how our error has changed
 				plt.plot(all_err)
@@ -67,6 +82,12 @@ class NeuralMMAgent(object):
 		def _adjust_weights_thetas(self):
 				'''Used to apply deltas
 				'''
+
+		def set_weights(self, arr):
+			pass
+
+		def set_thetas(self, arr):
+			pass
 
 
 		@staticmethod
@@ -98,10 +119,12 @@ class NeuralMMAgent(object):
 		@staticmethod
 		def sigmoid_af(summed_input):
 				#Sigmoid function
+				pass
 
 		@staticmethod
 		def sigmoid_af_deriv(sig_output):
 				#the derivative of the sigmoid function
+				pass
 
 test_agent = NeuralMMAgent(2, 2, 1, 1,random_seed=5, max_epoch=1000000, \
 														learning_rate=0.2, momentum=0)

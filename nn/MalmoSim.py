@@ -41,7 +41,8 @@ EntityInfo = namedtuple('EntityInfo', 'x, y, z, name, colour, variation, quantit
 EntityInfo.__new__.__defaults__ = (0, 0, 0, "", "", "", 1, 0, 0, 0, 0, 0, 0, 0)
 
 class MalmoSim:
-	'''Class to run mob simulation w/ agents
+	'''
+	Class to run mob simulation w/ agents
 	'''
 
 	# Task parameters:
