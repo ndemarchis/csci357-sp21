@@ -9,8 +9,6 @@ from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
 from keras.utils import np_utils
 
-np.random.seed(10)
-
 class NeuralMMAgent(object):
 		'''
 		Class to for Neural Net Agents
@@ -38,8 +36,17 @@ class NeuralMMAgent(object):
 				assert num_in_nodes > 0 and num_hid_layers > 0 and num_hid_nodes and\
 						num_out_nodes > 0, "Illegal number of input, hidden, or output layers!"
 
+				self.num_in_nodes = num_in_nodes
+				self.num_hid_nodes = num_hid_nodes
+				self.num_hid_layers = num_hid_layers
+				self.num_out_nodes = num_out_nodes
+				self.learning_rate = learning_rate
 				self.max_sse = max_sse
 				self.max_epoch = max_epoch
+				self.momentum = momentum
+				self.creation_function = creation_function
+				self.activation_function = activation_function
+				self.random_seed = np.random.seed(random_seed)
 
 
 		def train_net(self, input_list, output_list, max_num_epoch=100000, \
@@ -119,12 +126,13 @@ class NeuralMMAgent(object):
 		@staticmethod
 		def sigmoid_af(summed_input):
 				#Sigmoid function
-				pass
+				return 1 / (1 + np.exp(-x))
 
 		@staticmethod
 		def sigmoid_af_deriv(sig_output):
 				#the derivative of the sigmoid function
-				pass
+				sig = sigmoid_af(sig_output)
+				return sig * (1 - sig)
 
 test_agent = NeuralMMAgent(2, 2, 1, 1,random_seed=5, max_epoch=1000000, \
 														learning_rate=0.2, momentum=0)
