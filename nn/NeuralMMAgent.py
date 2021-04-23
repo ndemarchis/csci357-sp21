@@ -64,7 +64,6 @@ class NeuralMMAgent(object):
 				if (True): # fix
 					if (True): # fix
 						all_err.append(total_err)
-``
 						if (total_err < max_sse):
 							for i in range (1):
 								break

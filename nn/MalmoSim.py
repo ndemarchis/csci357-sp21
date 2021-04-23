@@ -34,6 +34,7 @@ import errno
 import math
 import tkinter as tk
 from collections import namedtuple
+from NN import NN
 from NeuralMMAgent import NeuralMMAgent
 
 
@@ -73,9 +74,12 @@ class MalmoSim:
 		self.agent_mob_weight = mob_weight
 		self.agent_turn_weight = turn_weight # Negative values to penalise turning, positive to encourage.
 		#output is the binary representation of our output index ([o,search_resolution))
-		self.agent_decision_net = NeuralMMAgent(search_resolution, \
+		self.agent_decision_net = NN(search_resolution, \
 			search_resolution, 2, math.ceil(math.log(search_resolution,2)), \
 			random_seed=10, max_epoch=50000, learning_rate=0.25, momentum=0.95)
+		# self.agent_decision_net = NeuralMMAgent(search_resolution, \
+		# 	search_resolution, 2, math.ceil(math.log(search_resolution,2)), \
+		# 	random_seed=10, max_epoch=50000, learning_rate=0.25, momentum=0.95)
 
 		self.training_obs = []
 		self.training_out = []

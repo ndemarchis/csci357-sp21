@@ -56,7 +56,7 @@ class NN:
         model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
         # fit the keras model on the dataset
-        model.fit(inny, outy, epochs=150, batch_size=10)
+        model.fit(inny, outy, epochs=1000, batch_size=10)
         _, accuracy = model.evaluate(inny, outy)
         print('Accuracy: %.2f' % (accuracy*100))
 
