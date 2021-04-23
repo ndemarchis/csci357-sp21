@@ -257,6 +257,9 @@ class MalmoSim:
 			else:
 				self.canvas.create_oval(self.canvas_x(ent.x)-4, self.canvas_y(ent.z)-4, self.canvas_x(ent.x)+4, self.canvas_y(ent.z)+4, fill="#22ff44")
 		self.root.update()
+# rvice/service.cc:168] XLA service 0x5572f36bb980 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+# 2021-04-23 12:19:32.748809: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Quadro K620, Compute Capability 5.0
+
 
 	def create_actions(self):
 		'''Returns dictionary of actions that make up agent action space (turning)
@@ -312,12 +315,17 @@ class MalmoSim:
 					if "entities" in info_json:
 						entities = [EntityInfo(**k) for k in info_json["entities"]]
 						self.draw_mobs(entities, flash)
-						best_yaw_bin = self.agent_decision_net.classify_input(self.get_scores(entities, current_yaw, current_life))
-						best_yaw = sum((round(best_yaw_bin[x]) * (2**x)) for x in range(len(best_yaw_bin)))
-						num_bin_dig = int(math.ceil(math.log(self.agent_search_resolution,2)))
-						desired_output_bin = [int(x) for x in ('{0:0'+str(num_bin_dig)+'b}').format(desired_output)]
-						self.training_out.append(desired_output_bin)
-						self.training_obs.append(inputs)
+						# best_yaw_bin = self.agent_decision_net.classify_input(self.get_scores(entities, agent_yaw, agent_life))
+						# best_yaw = sum((round(best_yaw_bin[x]) * (2**x)) for x in range(len(best_yaw_bin)))
+						# num_bin_dig = int(math.ceil(math.log(self.agent_search_resolution,2)))
+						# desired_output_bin = [int(x) for x in ('{0:0'+str(num_bin_dig)+'b}').format(desired_output)]
+
+						index, scores, best_yaw = self.get_best_angle(entities, agent_yaw, agent_life)
+						self.training_out.append(best_yaw)
+						self.training_obs.append(scores)
+
+						# self.training_out.append(desired_output_bin)
+						# self.training_obs.append(inputs)
 						difference = best_yaw - agent_yaw
 						#Sometimes we seem to get a difference above 360, still haven't figure out that one
 						while difference < -180:

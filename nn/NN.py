@@ -46,6 +46,9 @@ class NN:
     # def set_thetas(arr, arry):
     #     pass
 
+    def classify_input(arr, arr2):
+        pass
+
     def train_net(self, inny, outy, max_sse, max_num_epoch):
         model = Sequential()
         model.add(Dense(self.num_in_nodes, input_dim=len(inny[0]), activation="relu"))
