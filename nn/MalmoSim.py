@@ -333,7 +333,7 @@ class MalmoSim:
 						while difference > 180:
 							difference -= 360;
 						#Our action id is dependent upon our yaw angle to turn (see create_actions for more info)
-						action_id = int(differentititesence + 360) + 2
+						action_id = int(difference + 360) + 2
 						(obs, reward, sim_done, info) = env.step(action_id)
 
 						#difference /= 180.0;
