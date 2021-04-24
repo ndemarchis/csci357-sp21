@@ -1,0 +1,1 @@
+Please note that the README for each respective project is stored in their folders, in this case `ai-soc\README.md` and `nn\README.md`. 
